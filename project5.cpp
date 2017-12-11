@@ -1,4 +1,4 @@
-//  project3.cpp
+//  project5.cpp
 //
 //  Created by Tara Kreft
 //
@@ -78,7 +78,7 @@ int main()
 {
     int      programChoice;
     char     fileName[] = "songs.txt";
-    SongList library(1, fileName);
+    SongList library(fileName);
     
     cout << "Welcome to the music library interface!" << endl;
     

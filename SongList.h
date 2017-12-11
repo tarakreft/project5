@@ -8,12 +8,13 @@
 #define SongList_h
 
 #include "Song.h"
+#include <cstdlib>
 
 //songlist Model
 class SongList {
 public:
     SongList();
-    SongList(int initMax, const char fileName[]);
+    SongList(const char fileName[]);
     
     ~SongList();
     
@@ -48,13 +49,12 @@ private:
             songData.getAlbumTitle(albumTitle);
             songData.getIndex(index);
             
-            songData.setSongTitle(songTitle);
-            songData.setArtistName(artistName);
-            songData.setSongMins(songMins);
-            songData.setSongSecs(songSecs);
-            songData.setAlbumTitle(albumTitle);
-            songData.setIndex(index);
-            
+            data.setSongTitle(songTitle);
+            data.setArtistName(artistName);
+            data.setSongMins(songMins);
+            data.setSongSecs(songSecs);
+            data.setAlbumTitle(albumTitle);
+            data.setIndex(index);
             next = NULL;
             
         }

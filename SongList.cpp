@@ -15,11 +15,13 @@ using namespace std;
 
 SongList::SongList(){
     head = NULL;
+    tail = NULL;
     songListSize = 0;
 }
 
 SongList::SongList(const char fileName[]){
     head = NULL;
+    tail = NULL;
     songListSize = 0;
     readLibrary(fileName);
 }
@@ -47,7 +49,7 @@ void SongList::readLibrary(const char fileName[]){
     int      songSecs;
     char     tempSecs[4];
     char     albumTitle[maxChar];
-    int      index;
+    int      index = 0;
     char     tempIndex[4];
     Song     addedSong;
         
@@ -69,27 +71,24 @@ void SongList::readLibrary(const char fileName[]){
         infile.get(tempSecs, 4, ';');
         infile.get();
         infile.get(albumTitle, maxChar, ';');
-        infile.get();
-        infile.get(tempIndex, 4, '\n');
         infile.ignore(100, '\n');
         
         songMins = atoi(tempMins);
         songSecs = atoi(tempSecs);
-        index = atoi(tempIndex);
         
-        addedSong.getSongTitle(songTitle);
-        addedSong.getArtistName(artistName);
-        addedSong.getSongMins(songMins);
-        addedSong.getSongSecs(songSecs);
-        addedSong.getAlbumTitle(albumTitle);
-        addedSong.getIndex(index);
+        addedSong.setSongTitle(songTitle);
+        addedSong.setArtistName(artistName);
+        addedSong.setSongMins(songMins);
+        addedSong.setSongSecs(songSecs);
+        addedSong.setAlbumTitle(albumTitle);
+        addedSong.setIndex(index);
     
         Node * newNode = new Node(addedSong);
         Node * previous = NULL;
         Node * current = head;
         
         while(current){
-            current->songData.getSongTitle(currentSongTitle);
+            current->data.getSongTitle(currentSongTitle);
             if(strcmp(songTitle, currentSongTitle) < 0){
                 break;
             }
@@ -103,10 +102,10 @@ void SongList::readLibrary(const char fileName[]){
         if(!previous){
             head = newNode;
         }else{
-            prev->next = newNode;
+            previous->next = newNode;
         }
         
-        songListSize++
+        songListSize++;
         
         if(infile.peek() == EOF){
             return;
@@ -136,12 +135,12 @@ void SongList::saveLibrary(const char fileName[]) const {
     }
     
     for(current = head; current; current=current->next){
-        current->songData.getSongTitle(songTitle);
-        current->songData.getArtistName(artistName);
-        current->songData.getSongMins(songMins);
-        current->songData.getSongSecs(songSecs);
-        current->songData.getAlbumTitle(albumTitle);
-        current->songData.getIndex(index);
+        current->data.getSongTitle(songTitle);
+        current->data.getArtistName(artistName);
+        current->data.getSongMins(songMins);
+        current->data.getSongSecs(songSecs);
+        current->data.getAlbumTitle(albumTitle);
+        current->data.getIndex(index);
         
         outfile << songTitle << ';' << artistName << ';' << songMins << ';' << songSecs << ';' << albumTitle << ';' << index << endl;
     }
@@ -157,6 +156,7 @@ int SongList::getSongListSize() const {
 //add a song
 void SongList::addSong(){
     
+    char     currentSongTitle[maxChar];
     char     songTitle[maxChar];
     char     artistName[maxChar];
     int      songMins;
@@ -212,19 +212,19 @@ void SongList::addSong(){
         cin.getline(albumTitle, maxChar, '\n');
     }
     
-    addedSong.getSongTitle(songTitle);
-    addedSong.getArtistName(artistName);
-    addedSong.getSongMins(songMins);
-    addedSong.getSongSecs(songSecs);
-    addedSong.getAlbumTitle(albumTitle);
-    addedSong.getIndex(index);
+    addedSong.setSongTitle(songTitle);
+    addedSong.setArtistName(artistName);
+    addedSong.setSongMins(songMins);
+    addedSong.setSongSecs(songSecs);
+    addedSong.setAlbumTitle(albumTitle);
+    addedSong.setIndex(index);
     
     Node * newNode = new Node(addedSong);
     Node * previous = NULL;
     Node * current = head;
     
     while(current){
-        current->songData.getSongTitle(currentSongTitle);
+        current->data.getSongTitle(currentSongTitle);
         if(strcmp(songTitle, currentSongTitle) < 0){
             break;
         }
@@ -238,10 +238,10 @@ void SongList::addSong(){
     if(!previous){
         head = newNode;
     }else{
-        prev->next = newNode;
+        previous->next = newNode;
     }
     
-    songListSize++
+    songListSize++;
     
     addedSong.printSong();
 }
@@ -250,7 +250,7 @@ void SongList::addSong(){
 void SongList::removeSong(){
    Node *   current = head;
    Node *   previous = NULL;
-   int      count = 1;
+   int      count = 0;
    int      removeableIndex;
 
    
@@ -310,10 +310,10 @@ void SongList::searchForArtist() const {
     cout << left << setw(maxChar) << "Song Title" << setw(maxChar) << "Artist Name" << setw(7) << "Mins" << setw(1) << " " << setw(7) << "Secs" << setw(maxChar) << "Album Title" << setw(5) << "index" << endl;
     
     for(current=head; current!=NULL; current=current->next){
-        current->songData.getArtistName(artistName);
+        current->data.getArtistName(artistName);
         if(strcmp(artistName, searchTerm) == 0){
             matches++;
-            current->songData.printSong();
+            current->data.printSong();
         }
     }
     
@@ -342,10 +342,10 @@ void SongList::searchForAlbum() const {
     cout << left << setw(maxChar) << "Song Title" << setw(maxChar) << "Artist Name" << setw(7) << "Mins" << setw(1) << " " << setw(7) << "Secs" << setw(maxChar) << "Album Title" << setw(5) << "index" << endl;
     
     for(current=head; current!=NULL; current = current->next){
-        current->songData.getAlbumTitle(albumTitle);
+        current->data.getAlbumTitle(albumTitle);
         if(strcmp(albumTitle, searchTerm) == 0){
             matches++;
-            current->SongData.printSong();
+            current->data.printSong();
         }
     }
     
@@ -365,18 +365,20 @@ void SongList::displaySongs() const{
     char   albumTitle[maxChar];
     int    index;
     int    listSize = getSongListSize();
+    int    counter = 0;
     
     cout << left << setw(maxChar) << "Song Title" << setw(maxChar) << "Artist Name" << setw(7) << "Mins" << setw(1) << " " << setw(7) << "Secs" << setw(maxChar) << "Album Title" << setw(5) << "index" << endl;
     
     for(current=head; current; current=current->next){
-        current->songData.getSongTitle(songTitle);
-        current->songData.getArtistName(artistName);
-        current->songData.getSongMins(songMins);
-        current->songData.getSongSecs(songSecs);
-        current->songData.getAlbumTitle(albumTitle);
-        current->songData.getIndex(index);
-        
-        current->songData.printSong();
+        current->data.getSongTitle(songTitle);
+        current->data.getArtistName(artistName);
+        current->data.getSongMins(songMins);
+        current->data.getSongSecs(songSecs);
+        current->data.getAlbumTitle(albumTitle);
+        current->data.setIndex(counter);
+        current->data.getIndex(index);
+        counter++;
+        current->data.printSong();
         
     }
 }
