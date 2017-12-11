@@ -14,22 +14,24 @@
 using namespace std;
 
 SongList::SongList(){
-    max = maxList;
-    listOfSongs = new Song[max];
+    head = NULL;
     songListSize = 0;
 }
 
-SongList::SongList(int initMax, const char fileName[]){
-    max = initMax;
-    listOfSongs = new Song[max];
+SongList::SongList(const char fileName[]){
+    head = NULL;
     songListSize = 0;
     readLibrary(fileName);
 }
 
 //destructor
 SongList::~SongList(){
-    if(listOfSongs != NULL){
-        delete [] listOfSongs;
+    Node * current = head;
+    
+    while(head != NULL){
+        current = head->next;
+        delete head;
+        head = current;
     }
 }
 
@@ -78,26 +80,9 @@ void SongList::readLibrary(const char fileName[]){
             resize();
         }
         
-        addedSong.setSongTitle(songTitle);
-        addedSong.setArtistName(artistName);
-        addedSong.setSongMins(songMins);
-        addedSong.setSongSecs(songSecs);
-        addedSong.setAlbumTitle(albumTitle);
-        addedSong.setIndex(index);
-      
-        addedSong.getSongTitle(songTitle);
-        addedSong.getArtistName(artistName);
-        addedSong.getSongMins(songMins);
-        addedSong.getSongSecs(songSecs);
-        addedSong.getAlbumTitle(albumTitle);
-        addedSong.getIndex(index);
-        
-        listOfSongs[songListSize].setSongTitle(songTitle);
-        listOfSongs[songListSize].setArtistName(artistName);
-        listOfSongs[songListSize].setSongMins(songMins);
-        listOfSongs[songListSize].setSongSecs(songSecs);
-        listOfSongs[songListSize].setAlbumTitle(albumTitle);
-        listOfSongs[songListSize].setIndex(index);
+        Node * newNode = new Node(addedSong);
+        newNode->next = head;
+        head = newNode;
         
         songListSize++;
         
@@ -113,6 +98,7 @@ void SongList::readLibrary(const char fileName[]){
 void SongList::saveLibrary(const char fileName[]) const {
     
     ofstream outfile;
+    Node *   current;
     char     songTitle[maxChar];
     char     artistName[maxChar];
     int      songMins;
@@ -127,13 +113,13 @@ void SongList::saveLibrary(const char fileName[]) const {
         return;
     }
     
-    for(int i = 0; i < songListSize; i++){
-        listOfSongs[i].getSongTitle(songTitle);
-        listOfSongs[i].getArtistName(artistName);
-        listOfSongs[i].getSongMins(songMins);
-        listOfSongs[i].getSongSecs(songSecs);
-        listOfSongs[i].getAlbumTitle(albumTitle);
-        listOfSongs[i].getIndex(index);
+    for(current = head; current; current=current->next){
+        current->songData.getSongTitle(songTitle);
+        current->songData.getArtistName(artistName);
+        current->songData.getSongMins(songMins);
+        current->songData.getSongSecs(songSecs);
+        current->songData.getAlbumTitle(albumTitle);
+        current->songData.getIndex(index);
         
         outfile << songTitle << ';' << artistName << ';' << songMins << ';' << songSecs << ';' << albumTitle << ';' << index << endl;
     }
@@ -146,41 +132,6 @@ int SongList::getSongListSize() const {
     return songListSize;
 }
 
-//change size of songListSize
-void SongList::resize(){
-    Song *   tempSongList;
-    char     songTitle[maxChar];
-    char     artistName[maxChar];
-    int      songMins;
-    int      songSecs;
-    char     albumTitle[maxChar];
-    int      index;
-    
-    max *= 2;
-    tempSongList = new Song[max];
-    
-    for(int i=0; i<songListSize; i++){
-        listOfSongs[i].getSongTitle(songTitle);
-        listOfSongs[i].getArtistName(artistName);
-        listOfSongs[i].getSongMins(songMins);
-        listOfSongs[i].getSongSecs(songSecs);
-        listOfSongs[i].getAlbumTitle(albumTitle);
-        listOfSongs[i].getIndex(index);
-        
-        tempSongList[i].setSongTitle(songTitle);
-        tempSongList[i].setArtistName(artistName);
-        tempSongList[i].setSongMins(songMins);
-        tempSongList[i].setSongSecs(songSecs);
-        tempSongList[i].setAlbumTitle(albumTitle);
-        tempSongList[i].setIndex(index);
-    }
-    
-    delete [] listOfSongs;
-    
-    listOfSongs = tempSongList;
-    tempSongList = NULL;
-}
-
 //add a song
 void SongList::addSong(){
     
@@ -191,10 +142,6 @@ void SongList::addSong(){
     char     albumTitle[maxChar];
     Song     addedSong;
     int      index = getSongListSize();
-    
-    if(songListSize == max){
-        resize();
-    }
     
     cout << "Please enter the title of the song you are add to the library:";
     cin.getline(songTitle, maxChar, '\n');
@@ -243,30 +190,13 @@ void SongList::addSong(){
         cin.getline(albumTitle, maxChar, '\n');
     }
     
-    addedSong.setSongTitle(songTitle);
-    addedSong.setArtistName(artistName);
-    addedSong.setSongMins(songMins);
-    addedSong.setSongSecs(songSecs);
-    addedSong.setAlbumTitle(albumTitle);
-    addedSong.setIndex(index);
-    
-    addedSong.getSongTitle(songTitle);
-    addedSong.getArtistName(artistName);
-    addedSong.getSongMins(songMins);
-    addedSong.getSongSecs(songSecs);
-    addedSong.getAlbumTitle(albumTitle);
-    addedSong.getIndex(index);
-
-    listOfSongs[songListSize].setSongTitle(songTitle);
-    listOfSongs[songListSize].setArtistName(artistName);
-    listOfSongs[songListSize].setSongMins(songMins);
-    listOfSongs[songListSize].setSongSecs(songSecs);
-    listOfSongs[songListSize].setAlbumTitle(albumTitle);
-    listOfSongs[songListSize].setIndex(index);
-    
-    addedSong.printSong();
+    Node * newNode = new Node(addedSong);
+    newNode->next = head;
+    head = newNode;
     
     songListSize++;
+    
+    addedSong.printSong();
 }
 
 // remove a song
@@ -294,9 +224,6 @@ void SongList::removeSong(){
 
    for(int i = 0; i < songListSize; i++){
        
-       if(songListSize == max){
-           resize();
-       }
        
        if(indexFound == true){
         
@@ -349,9 +276,10 @@ void SongList::removeSong(){
 
 //search by artist
 void SongList::searchForArtist() const {
-    char searchTerm[maxChar];
-    char artistName[maxChar];
-    int  matches = 0;
+    Node * current;
+    char   searchTerm[maxChar];
+    char   artistName[maxChar];
+    int    matches = 0;
     
     cout << "enter the artist you would like to search for: " << endl;
     
@@ -365,11 +293,11 @@ void SongList::searchForArtist() const {
     
     cout << left << setw(maxChar) << "Song Title" << setw(maxChar) << "Artist Name" << setw(7) << "Mins" << setw(1) << " " << setw(7) << "Secs" << setw(maxChar) << "Album Title" << setw(5) << "index" << endl;
     
-    for(int i=0; i < songListSize; i++){
-        listOfSongs[i].getArtistName(artistName);
+    for(current=head; current!=NULL; current=current->next){
+        current->songData.getArtistName(artistName);
         if(strcmp(artistName, searchTerm) == 0){
             matches++;
-            listOfSongs[i].printSong();
+            current->songData.printSong();
         }
     }
     
@@ -380,9 +308,10 @@ void SongList::searchForArtist() const {
 
 //search by album
 void SongList::searchForAlbum() const {
-    char searchTerm[maxChar];
-    char albumTitle[maxChar];
-    int  matches = 0;
+    Node * current;
+    char   searchTerm[maxChar];
+    char   albumTitle[maxChar];
+    int    matches = 0;
     
     cout << "enter the album you would like to search for: " << endl;
     
@@ -396,11 +325,11 @@ void SongList::searchForAlbum() const {
     
     cout << left << setw(maxChar) << "Song Title" << setw(maxChar) << "Artist Name" << setw(7) << "Mins" << setw(1) << " " << setw(7) << "Secs" << setw(maxChar) << "Album Title" << setw(5) << "index" << endl;
     
-    for(int i=0; i < songListSize; i++){
-        listOfSongs[i].getAlbumTitle(albumTitle);
+    for(current=head; current!=NULL; current = current->next){
+        current->songData.getAlbumTitle(albumTitle);
         if(strcmp(albumTitle, searchTerm) == 0){
             matches++;
-            listOfSongs[i].printSong();
+            current->SongData.printSong();
         }
     }
     
@@ -412,6 +341,7 @@ void SongList::searchForAlbum() const {
 //show all songs
 void SongList::displaySongs() const{
     
+    Node * current;
     char   songTitle[maxChar];
     char   artistName[maxChar];
     int    songMins;
@@ -422,15 +352,15 @@ void SongList::displaySongs() const{
     
     cout << left << setw(maxChar) << "Song Title" << setw(maxChar) << "Artist Name" << setw(7) << "Mins" << setw(1) << " " << setw(7) << "Secs" << setw(maxChar) << "Album Title" << setw(5) << "index" << endl;
     
-    for(int i = 0; i < listSize; i++){
-        listOfSongs[i].getSongTitle(songTitle);
-        listOfSongs[i].getArtistName(artistName);
-        listOfSongs[i].getSongMins(songMins);
-        listOfSongs[i].getSongSecs(songSecs);
-        listOfSongs[i].getAlbumTitle(albumTitle);
-        listOfSongs[i].getIndex(index);
+    for(current=head; current; current=current->next){
+        current->songData.getSongTitle(songTitle);
+        current->songData.getArtistName(artistName);
+        current->songData.getSongMins(songMins);
+        current->songData.getSongSecs(songSecs);
+        current->songData.getAlbumTitle(albumTitle);
+        current->songData.getIndex(index);
         
-        listOfSongs[i].printSong();
+        current->songData.printSong();
         
     }
 }

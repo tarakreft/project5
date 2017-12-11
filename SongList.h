@@ -29,11 +29,46 @@ public:
     void displaySongs() const;
     
 private:
-    Song * listOfSongs;
-    int    songListSize;
-    int    max;
+//    Song * listOfSongs;
+//    int    songListSize;
+//    int    max;
+//    void   resize();
     
-    void   resize();
+    struct Node {
+        
+        Song   data;
+        Node * next;
+        
+        Node(const Song& songData){
+            char     songTitle[maxChar];
+            char     artistName[maxChar];
+            int      songMins;
+            int      songSecs;
+            char     albumTitle[maxChar];
+            int      index;
+            
+            songData.getSongTitle(songTitle);
+            songData.getArtistName(artistName);
+            songData.getSongMins(songMins);
+            songData.getSongSecs(songSecs);
+            songData.getAlbumTitle(albumTitle);
+            songData.getIndex(index);
+            
+            songData.setSongTitle(songTitle);
+            songData.setArtistName(artistName);
+            songData.setSongMins(songMins);
+            songData.setSongSecs(songSecs);
+            songData.setAlbumTitle(albumTitle);
+            songData.setIndex(index);
+            
+            next = NULL;
+            
+        }
+    };
+    
+    Node * head;
+    int    songListSize;
+    
 };
 
 #endif /* SongList_h */
