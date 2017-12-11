@@ -9,8 +9,6 @@
 
 #include "Song.h"
 
-const int maxList = 100;
-
 //songlist Model
 class SongList {
 public:
@@ -29,10 +27,6 @@ public:
     void displaySongs() const;
     
 private:
-//    Song * listOfSongs;
-//    int    songListSize;
-//    int    max;
-//    void   resize();
     
     struct Node {
         
@@ -67,6 +61,7 @@ private:
     };
     
     Node * head;
+    Node * tail;
     int    songListSize;
     
 };

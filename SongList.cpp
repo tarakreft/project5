@@ -39,6 +39,7 @@ SongList::~SongList(){
 void SongList::readLibrary(const char fileName[]){
         
     ifstream infile;
+    char     currentSongTitle[maxChar];
     char     songTitle[maxChar];
     char     artistName[maxChar];
     int      songMins;
@@ -76,15 +77,36 @@ void SongList::readLibrary(const char fileName[]){
         songSecs = atoi(tempSecs);
         index = atoi(tempIndex);
         
-        if(songListSize == max){
-            resize();
+        addedSong.getSongTitle(songTitle);
+        addedSong.getArtistName(artistName);
+        addedSong.getSongMins(songMins);
+        addedSong.getSongSecs(songSecs);
+        addedSong.getAlbumTitle(albumTitle);
+        addedSong.getIndex(index);
+    
+        Node * newNode = new Node(addedSong);
+        Node * previous = NULL;
+        Node * current = head;
+        
+        while(current){
+            current->songData.getSongTitle(currentSongTitle);
+            if(strcmp(songTitle, currentSongTitle) < 0){
+                break;
+            }
+            
+            previous = current;
+            current = current->next;
         }
         
-        Node * newNode = new Node(addedSong);
-        newNode->next = head;
-        head = newNode;
+        newNode->next = current;
         
-        songListSize++;
+        if(!previous){
+            head = newNode;
+        }else{
+            prev->next = newNode;
+        }
+        
+        songListSize++
         
         if(infile.peek() == EOF){
             return;
@@ -190,26 +212,47 @@ void SongList::addSong(){
         cin.getline(albumTitle, maxChar, '\n');
     }
     
-    Node * newNode = new Node(addedSong);
-    newNode->next = head;
-    head = newNode;
+    addedSong.getSongTitle(songTitle);
+    addedSong.getArtistName(artistName);
+    addedSong.getSongMins(songMins);
+    addedSong.getSongSecs(songSecs);
+    addedSong.getAlbumTitle(albumTitle);
+    addedSong.getIndex(index);
     
-    songListSize++;
+    Node * newNode = new Node(addedSong);
+    Node * previous = NULL;
+    Node * current = head;
+    
+    while(current){
+        current->songData.getSongTitle(currentSongTitle);
+        if(strcmp(songTitle, currentSongTitle) < 0){
+            break;
+        }
+        
+        previous = current;
+        current = current->next;
+    }
+    
+    newNode->next = current;
+    
+    if(!previous){
+        head = newNode;
+    }else{
+        prev->next = newNode;
+    }
+    
+    songListSize++
     
     addedSong.printSong();
 }
 
 // remove a song
 void SongList::removeSong(){
-   
-   char     songTitle[maxChar];
-   char     artistName[maxChar];
-   int      songMins;
-   int      songSecs;
-   char     albumTitle[maxChar];
-   int      index;
+   Node *   current = head;
+   Node *   previous = NULL;
+   int      count = 1;
    int      removeableIndex;
-   bool     indexFound = false;
+
    
    cout << "Please enter the index of the song that you would like to remove:" << endl;
    cin >> removeableIndex;
@@ -222,53 +265,26 @@ void SongList::removeSong(){
    }
    cin.ignore(maxChar, '\n');
 
-   for(int i = 0; i < songListSize; i++){
-       
-       
-       if(indexFound == true){
-        
+    while(current && count < removeableIndex){
+        previous = current;
+        current = current->next;
+        count++;
+    }
+    
+    if(!previous){
+        head = current->next;
+    }else if(current == tail){
+        previous->next = current->next;
+        tail = previous;
+    }else{
+        previous->next = current->next;
+    }
+    
+    delete current;
+    current = NULL;
+    previous = NULL;
 
-           listOfSongs[i + 1].getSongTitle(songTitle);
-           listOfSongs[i + 1].getArtistName(artistName);
-           listOfSongs[i + 1].getSongMins(songMins);
-           listOfSongs[i + 1].getSongSecs(songSecs);
-           listOfSongs[i + 1].getAlbumTitle(albumTitle);
-           listOfSongs[i + 1].getIndex(index);
-
-           index--;
-
-           listOfSongs[i].setSongTitle(songTitle);
-           listOfSongs[i].setArtistName(artistName);
-           listOfSongs[i].setSongMins(songMins);
-           listOfSongs[i].setSongSecs(songSecs);
-           listOfSongs[i].setAlbumTitle(albumTitle);
-           listOfSongs[i].setIndex(index);
-
-       } else if(i == removeableIndex){
-           indexFound = true;
-           
-           listOfSongs[i + 1].getSongTitle(songTitle);
-           listOfSongs[i + 1].getArtistName(artistName);
-           listOfSongs[i + 1].getSongMins(songMins);
-           listOfSongs[i + 1].getSongSecs(songSecs);
-           listOfSongs[i + 1].getAlbumTitle(albumTitle);
-           listOfSongs[i + 1].getIndex(index);
-
-           index--;
-
-           listOfSongs[i].setSongTitle(songTitle);
-           listOfSongs[i].setArtistName(artistName);
-           listOfSongs[i].setSongMins(songMins);
-           listOfSongs[i].setSongSecs(songSecs);
-           listOfSongs[i].setAlbumTitle(albumTitle);
-           listOfSongs[i].setIndex(index);
-       } else {
-
-        cout << "searching by index..." << endl;
-       }
-   }
-
-      songListSize--;
+    songListSize--;
    
    cout << "the song with index " << removeableIndex << " has been removed." << endl;
    
